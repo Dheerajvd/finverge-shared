@@ -11,9 +11,11 @@ git push
 
 ## Git Tagging
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
+
+Note: Increase the above counter after each push
 
 ## T0 Fetch in services
 go get github.com/Dheerajvd/finverge-shared@v0.1.0
