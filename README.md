@@ -11,8 +11,8 @@ git push
 
 ## Git Tagging
 ```bash
-git tag v0.1.4
-git push origin v0.1.4
+git tag v0.1.5
+git push origin v0.1.5
 ```
 
 Note: Increase the above counter after each push
