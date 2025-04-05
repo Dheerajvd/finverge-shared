@@ -89,3 +89,17 @@ func GetMongoDataBase(dbName string) *mongo.Database {
 func GetPostgresDB() *gorm.DB {
 	return dbClient.PostgresDB
 }
+
+func AutoMigrateModels(models ...interface{}) error {
+	db := GetPostgresDB()
+	if db == nil {
+		return fmt.Errorf("PostgreSQL database is not initialized")
+	}
+
+	err := db.AutoMigrate(models...)
+	if err != nil {
+		return fmt.Errorf("auto migration failed: %v", err)
+	}
+	log.Println("Auto migration successful for provided models")
+	return nil
+}
