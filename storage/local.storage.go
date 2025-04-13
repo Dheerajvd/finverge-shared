@@ -3,10 +3,10 @@ package storage
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type LocalUploader struct {
@@ -25,7 +25,13 @@ func (l *LocalUploader) Upload(file io.Reader, fileHeader *multipart.FileHeader)
 		return "", fmt.Errorf("failed to create uploads directory: %v", err)
 	}
 
-	filePath := filepath.Join(uploadsDir, fileHeader.Filename)
+	// Add 13-digit timestamp to filename
+	ext := filepath.Ext(fileHeader.Filename)
+	name := fileHeader.Filename[:len(fileHeader.Filename)-len(ext)]
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	newFilename := fmt.Sprintf("%s-%d%s", name, timestamp, ext)
+
+	filePath := filepath.Join(uploadsDir, newFilename)
 	destFile, err := os.Create(filePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %v", err)
@@ -47,7 +53,7 @@ func (l *LocalUploader) Get(filename string) (io.ReadCloser, error) {
 
 // List returns all files under BasePath
 func (l *LocalUploader) List() ([]string, error) {
-	files, err := ioutil.ReadDir(l.BasePath)
+	files, err := os.ReadDir(l.BasePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list files: %v", err)
 	}

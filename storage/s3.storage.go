@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"path/filepath"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -21,7 +22,14 @@ type S3Uploader struct {
 
 // Upload a file to S3
 func (s *S3Uploader) Upload(file io.Reader, fileHeader *multipart.FileHeader) (string, error) {
-	fileKey := filepath.Join(s.BasePath, fileHeader.Filename)
+	// Extract original filename components
+	ext := filepath.Ext(fileHeader.Filename)
+	name := fileHeader.Filename[:len(fileHeader.Filename)-len(ext)]
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond) // 13-digit timestamp
+	newFilename := fmt.Sprintf("%s-%d%s", name, timestamp, ext)
+
+	// Build the S3 object key
+	fileKey := filepath.Join(s.BasePath, newFilename)
 
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, file); err != nil {
